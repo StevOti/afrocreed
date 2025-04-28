@@ -1,0 +1,86 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{% block title %} {% endblock %}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mukta:300,400,700"> 
+    <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+
+
+    <link rel="stylesheet" href="{% static 'css/aos.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    {% block extra_css %}
+    {% endblock %}
+    
+  </head>
+  <body>
+  
+  <div class="site-wrap">
+    
+
+    {% include 'navbar.html' %}
+    
+
+    {% if messages %}
+        <div style="display:none;">
+            {% for message in messages %}
+                <div id="message-{{ forloop.counter }}" data-message="{{ message }}" data-tags="{{ message.tags }}"></div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}
+
+    {% endblock %}
+
+    {% include 'footer.html' %}
+
+    
+  </div>
+
+  <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'js/jquery-ui.js' %}"></script>
+  <script src="{% static 'js/popper.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+  <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+  <script src="{% static 'js/aos.js' %}"></script>
+
+  <script src="{% static 'js/main.js' %}"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Process all messages
+        document.querySelectorAll('[id^="message-"]').forEach(function(el) {
+            const messageText = el.getAttribute('data-message');
+            const messageTags = el.getAttribute('data-tags');
+            let messageType = "success"; // default
+            
+            // Map Django message tags to message types
+            if (messageTags.includes('error')) messageType = 'fail';
+            else if (messageTags.includes('warning')) messageType = 'warning';
+            else if (messageTags.includes('info')) messageType = 'info';
+            
+            // Show the toast
+            const toast = new Message('toast-' + el.id);
+            toast.show(messageText, messageType, "top-right");
+        });
+    });
+  </script>
+    
+  </body>
+</html>

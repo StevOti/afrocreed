@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+  Cart | AfroCreed
+{% endblock %}
+
+{% block content %}
+
+<div class="bg-light py-3">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 mb-0"><a href="index.html">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Cart</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="site-section">
+  <div class="container">
+    <div class="row mb-5">
+      <form class="col-md-12" method="post">
+        <div class="site-blocks-table">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th class="product-thumbnail">Image</th>
+                <th class="product-name">Product</th>
+                <th class="product-price">Price</th>
+                <th class="product-quantity">Quantity</th>
+                <th class="product-total">Total</th>
+                <th class="product-remove">Remove</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if cart_products %}
+                {% for product in cart_products %}
+              <tr>
+                <td class="product-thumbnail">
+                  <img src="{{ product.image.url }}" alt="Image" class="img-fluid">
+                </td>
+                <td class="product-name">
+                  <h2 class="h5 text-black">{{ product.name }}</h2>
+                </td>
+                {% if product.is_sale %}
+                <td>$ {{ product.sale_price }}</td>
+                {% else %}
+                <td>$ {{ product.price }}</td>
+                {% endif %}
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="input-group mr-2" style="max-width: 120px;">
+                      <div class="input-group-prepend">
+                        <button class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
+                      </div>
+                      {% for key, value in quantities.items %}
+                        {% if key == product.id|slugify %}
+                      <input type="text" class="form-control text-center" value="{{ value }}" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1" id="select{{product.id}}">
+                        {% endif %}
+                      {% endfor %}
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-primary js-btn-plus" type="button">&plus;</button>
+                      </div>
+                    </div>
+                    <a href="#" class="btn btn-primary height-auto btn-sm update-cart" data-product-id="{{ product.id }}">↻</a>
+                  </div>
+                </td>
+                <td>$49.00</td>
+                <td><a href="#" class="btn btn-primary height-auto btn-sm delete-product" data-product-id="{{ product.id }}">X</a></td>
+              </tr>
+              {% endfor %}
+              {% else %}
+              <tr>
+                <td colspan="6" class="text-center">
+                  <h2 class="h5 text-black">Your cart is empty</h2>
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </form>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="row mb-5">
+          <div class="col-md-6 mb-3 mb-md-0">
+            <button class="btn btn-primary btn-sm btn-block">Update Cart</button>
+          </div>
+          <div class="col-md-6">
+            <button class="btn btn-outline-primary btn-sm btn-block">Continue Shopping</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <label class="text-black h4" for="coupon">Coupon</label>
+            <p>Enter your coupon code if you have one.</p>
+          </div>
+          <div class="col-md-8 mb-3 mb-md-0">
+            <input type="text" class="form-control py-3" id="coupon" placeholder="Coupon Code">
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-primary btn-sm px-4">Apply Coupon</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 pl-5">
+        <div class="row justify-content-end">
+          <div class="col-md-7">
+            <div class="row">
+              <div class="col-md-12 text-right border-bottom mb-5">
+                <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <span class="text-black">Subtotal</span>
+              </div>
+              <div class="col-md-6 text-right">
+                <strong class="text-black">$ {{ totals }}</strong>
+              </div>
+            </div>
+            <div class="row mb-5">
+              <div class="col-md-6">
+                <span class="text-black">Total</span>
+              </div>
+              <div class="col-md-6 text-right">
+                <strong class="text-black">$ {{ totals }}</strong>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <a class="btn btn-primary btn-lg btn-block" href="{% url 'checkout' %}">Proceed To Checkout</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  // Update cart
+  $(document).on('click', '.update-cart', function(e){
+      e.preventDefault();
+      // Grab the product id from the button
+      var productid = $(this).data('product-id');  // FIXED: Use product-id instead of index
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'cart_update' %}",
+        data: {
+          product_id: productid,  // FIXED: Use the variable we just defined
+          product_qty: $('#select' + productid).val(),
+          action: 'post',
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(json){
+          location.reload();
+        },
+        error: function(xhr, status, err){
+          console.log("Error updating cart:", err);
+        }
+      });
+  })
+    
+  // Delete item from cart
+    $(document).on('click', '.delete-product', function(e){
+        e.preventDefault();
+        // Get the product ID from the button
+        var productid = $(this).data('product-id');
+        
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'cart_delete' %}",
+          data: {
+            product_id: productid,
+            action: 'post',
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function(json){
+            location.reload();
+          },
+          error: function(xhr, status, err){
+            console.log("Error deleting product:", err);
+          }
+        });
+    })
+  </script>
+
+{% endblock %}

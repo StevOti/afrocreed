@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Update User Info | Afrocreed
+{% endblock %}
+
+{% block content %}
+<div class="site-blocks-cover" data-aos="fade">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 ml-auto order-md-2 align-self-start">
+        <div class="site-block-cover-content">
+        <h2 class="sub-title">#update user</h2>
+        <h1>Update User Information</h1>
+        <p><a href="#" class="btn btn-black rounded-0">Update User Information</a></p>
+        </div>
+      </div>
+      <div class="col-md-6 order-1 align-self-end">
+        <img src="{% static 'images/model_3.png' %}" alt="Image" class="img-fluid">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="site-section">
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title text-center">Billing Information</h3>
+
+                        <form method="POST" action="{% url 'update_info' %}">
+                            {% csrf_token %}
+                            
+                            {{ form.as_p }}
+
+                            <h3 class="card-title text-center">Shipping Information</h3>
+
+                            {{ shipping_form.as_p }}  
+
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Update Information</button>
+                            </div>
+
+                        </form>
+
+                        <p class="text-center mt-3">Forgot your password? <a href="{% url 'update_password' %}">Update Password</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

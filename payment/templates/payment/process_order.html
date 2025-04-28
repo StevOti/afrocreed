@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Checkout | AfroCreed
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="site-blocks-cover inner-page" data-aos="fade">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 ml-auto order-md-2 align-self-start">
+        <div class="site-block-cover-content">
+        <h2 class="sub-title">#Process Order</h2>
+        <h1>Process Order</h1>
+        <p><a href="#" class="btn btn-black rounded-0">Process Order</a></p>
+        </div>
+      </div>
+      <div class="col-md-6 order-1 align-self-end">
+        <img src="images/model_7.png" alt="Image" class="img-fluid">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="custom-border-bottom py-3">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 mb-0"><a href="index.html">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Billing Information</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="site-section site-section-sm site-blocks-1 border-0" data-aos="fade">
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        Order Summary
+      </div>
+      <div class="card-body">
+        {% for product in cart_products %}
+          {{ product.name }} :
+          {% if product.is_sale %}
+            $ {{ product.sale_price }}
+          {% else %}
+            $ {{ product.price }}
+          {% endif %}
+          <small> Quantity: 
+          {% for key, value in quantities.items %}
+            {% if key == product.id|slugify %}
+              {{ value }}
+            {% endif %}
+          {% endfor %}
+          </small>
+          <br/>
+
+        {% endfor %}
+
+        <hr/>
+        <h4>Total: $ {{ totals }}</h4>
+
+        <p><a href="{% url 'cart_summary' %}" class="btn btn-black rounded-0">Update Items</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="site-section site-section-sm site-blocks-1 border-0" data-aos="fade">
+  <div class="container">
+        <div class="card">
+            <div class="card-header">
+                Shipping Information
+            </div>
+            <div class="card-body">
+            
+            Name: {{ shipping_info.shipping_full_name }}
+            <br/>
+            Email: {{ shipping_info.shipping_email }}
+            <br/>
+            Address: {{ shipping_info.shipping_address1 }}
+            <br/>
+            Address 2: {{ shipping_info.shipping_address2 }}
+            <br/>
+            City: {{ shipping_info.shipping_city }}
+            <br/>
+            State: {{ shipping_info.shipping_state }}
+            <br/>
+            Zip Code: {{ shipping_info.shipping_zipcode }}
+            <br/>
+            Country: {{ shipping_info.shipping_country }}
+
+            <br/>
+            <br/>
+
+            <p><a href="{% url 'checkout' %}" class="btn btn-black rounded-0">Update Shipping Details</a></p>  
+            </div>
+        <hr/>
+        </div>
+        <p><a href="#" class="btn btn-black rounded-0">Pay Now</a></p>
+  </div>
+</div>
+
+<div class="site-section site-section-sm site-blocks-1 border-0" data-aos="fade">
+    <div class="container">
+          <div class="card">
+              <div class="card-header">
+                  Billing Information
+              </div>
+              <div class="card-body">
+              
+            <form action="{% url 'process_order' %}" method="POST">
+              {{ billing_form.as_p }}
+                <br/>
+              </div>
+          </div>
+
+            <br/>
+            <br/>
+            <p><button type="submit" class="btn btn-black rounded-0">Pay Now</button></p>
+
+        </form>
+    </div>
+  </div>
+
+{% endblock %}

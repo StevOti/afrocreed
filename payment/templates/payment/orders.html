@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+About Us | AfroCreed
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="site-blocks-cover inner-page" data-aos="fade">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 ml-auto order-md-2 align-self-start">
+        <div class="site-block-cover-content">
+        <h2 class="sub-title">#shipped products</h2>
+        <h1>Shipped Products</h1>
+        <p><a href="#" class="btn btn-black rounded-0">Shipped Products</a></p>
+        </div>
+      </div>
+      <div class="col-md-6 order-1 align-self-end">
+        <img src="images/model_7.png" alt="Image" class="img-fluid">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="custom-border-bottom py-3">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 mb-0"><a href="index.html">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Shipped Products</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="site-section site-section-sm site-blocks-1 border-0" data-aos="fade">
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+              Order {{ order.id }} - $ {{ order.amount_paid }}
+            </div>
+            <div class="card-body">
+                Email: {{ order.email }}<br>
+
+                {% if order.date_shipped %}
+                    Date Shipped: {{ order.date_shipped }}<br>
+                {% else %}
+                    Date Ordered: {{ order.date_ordered }}<br>
+                {% endif %}
+                <br/>
+
+                Full Name: {{ order.full_name }}<br>
+                <pre>Shipping Address: {{ order.shipping_address }}</pre><br>
+
+                {% for item in items %}
+                Items Ordered:<br>
+                <ul>
+                    <li>{{ item.product.name }} - {{ item.quantity }} @ ${{ item.product.price }}<br></li>
+                </ul>
+
+                {% endfor %}
+
+                {% if not order.shipped %}
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="shipping_status" value="true">
+                    <button type="submit" class="btn btn-primary">Mark as Shipped</button>
+                </form>
+                {% else %}
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="shipping_status" value="false">
+                    <button type="submit" class="btn btn-primary">Mark as Not Shipped</button>
+                </form>
+                {% endif %}
+
+            </div>
+          </div>
+    </div>
+</div>
+
+{% endblock %}
