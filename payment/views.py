@@ -7,11 +7,22 @@ from django.contrib.auth.models import User
 from store.models import Product, Profile
 import datetime
 
+# Import some paypal stuff
+from django.urls import reverse
+from paypal.standard.forms import PayPalPaymentsForm
+from django.conf import settings
+import uuid #Unique user id for the duplicate order
+
 # Create your views here.
 
 def payment_success(request):
     # Render the payment success template
     return render(request, 'payment/payment_success.html', {})
+
+
+def payment_failed(request):
+    # Render the payment success template
+    return render(request, 'payment/payment_failed.html', {})
 
 def checkout(request):
     # Render the checkout template
@@ -48,12 +59,31 @@ def billing_info(request):
         my_shipping = request.POST
         request.session['my_shipping'] = my_shipping
 
+        # Get the host
+        host = request.get_host()
+
+        # Create paypal form dictionary
+        paypal_dict = {
+            'business': settings.PAYPAL_RECEIVER_EMAIL,
+            'amount': totals,
+            'item_name': 'Order from AfroCreed',
+            'no_shipping': 2,
+            'invoice': str(uuid.uuid4()),  # Unique invoice ID
+            'currency_code': 'USD',
+            'notify_url': f'https://{host}{reverse("paypal-ipn")}',  # IPN URL
+            'return': f'https://{host}{reverse("payment_success")}',  # Return URL after payment
+            'cancel_return': f'https://{host}{reverse("home")}',  # Cancel URL
+        }
+
+        paypal_form = PayPalPaymentsForm(initial=paypal_dict)
+
+
 
         # check to see if user is logged in
         if request.user.is_authenticated:
             # Get payment form
             billing_form = PaymentForm()
-            return render(request, 'payment/billing_info.html', {'cart_products': cart_products, 'quantities': quantities, 'totals': totals, 'shipping_info': request.POST, 'billing_form': billing_form})
+            return render(request, 'payment/billing_info.html', {'cart_products': cart_products, 'quantities': quantities, 'totals': totals, 'shipping_info': request.POST, 'billing_form': billing_form, 'paypal_form':paypal_form})
 
         else:
             # Get payment form

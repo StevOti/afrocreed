@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'cart',
     'payment',
     'whitenoise.runserver_nostatic',
+    'paypal.standard.ipn',
 ]
 
 MIDDLEWARE = [
@@ -86,15 +87,14 @@ WSGI_APPLICATION = 'afrocreed.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': 'turntable.proxy.rlwy.net',
-        'PORT': '52710',
-        
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME': 'railway',
+        # 'USER': 'postgres',
+        # 'PASSWORD': os.environ.get('DB_PASSWORD'),
+        # 'HOST': 'interchange.proxy.rlwy.net',
+        # 'PORT': '14477',
     }
 }
 
@@ -148,3 +148,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Paypal Settings
+# Set sandbox to True for testing, False for production
+PAYPAL_TEST = True
+
+PAYPAL_RECEIVER_EMAIL = 'afrocreed@gmail.com'
