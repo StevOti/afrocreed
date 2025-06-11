@@ -16,7 +16,19 @@ import uuid #Unique user id for the duplicate order
 # Create your views here.
 
 def payment_success(request):
-    # Render the payment success template
+    # Delete the browser cart
+    # First get the cart
+    cart = Cart(request)
+    cart_products = cart.get_prods()
+    quantities = cart.get_quants() 
+    totals = cart.cart_total()
+
+    # Clear the cart
+    for key in list(request.session.keys()):
+        if key == "session_key":
+            # delete the session key
+            del request.session[key]
+
     return render(request, 'payment/payment_success.html', {})
 
 
@@ -59,8 +71,20 @@ def billing_info(request):
         my_shipping = request.POST
         request.session['my_shipping'] = my_shipping
 
+        # Gather order info
+        full_name = my_shipping['shipping_full_name']
+        email = my_shipping['shipping_email']
+        # Create shipping address from the session data
+        shipping_address = f"{my_shipping['shipping_full_name']}\n {my_shipping['shipping_address1']}\n {my_shipping['shipping_address2']}\n {my_shipping['shipping_city']}\n {my_shipping['shipping_state']}\n {my_shipping['shipping_zipcode']}\n {my_shipping['shipping_country']}"
+        amount_paid = totals
+
         # Get the host
         host = request.get_host()
+
+        # Create an invoice number
+        my_Invoice = str(uuid.uuid4())
+
+        # Create an order
 
         # Create paypal form dictionary
         paypal_dict = {
@@ -68,11 +92,17 @@ def billing_info(request):
             'amount': totals,
             'item_name': 'Order from AfroCreed',
             'no_shipping': 2,
-            'invoice': str(uuid.uuid4()),  # Unique invoice ID
+            'invoice': my_Invoice,  # Unique invoice ID
             'currency_code': 'USD',
             'notify_url': f'https://{host}{reverse("paypal-ipn")}',  # IPN URL
             'return': f'https://{host}{reverse("payment_success")}',  # Return URL after payment
-            'cancel_return': f'https://{host}{reverse("home")}',  # Cancel URL
+            'cancel_return': f'https://{host}{reverse("payment_failed")}',  # Cancel URL
+
+            # after hosting change all the urls to https
+            # 'notify_url': f'https://{host}{reverse("paypal-ipn")}',  # IPN URL
+            # 'return': f'https://{host}{reverse("payment_success")}',  # Return URL after payment
+            # 'cancel_return': f'https://{host}{reverse("home")}',  # Cancel URL
+
         }
 
         paypal_form = PayPalPaymentsForm(initial=paypal_dict)
@@ -83,18 +113,73 @@ def billing_info(request):
         if request.user.is_authenticated:
             # Get payment form
             billing_form = PaymentForm()
-            return render(request, 'payment/billing_info.html', {'cart_products': cart_products, 'quantities': quantities, 'totals': totals, 'shipping_info': request.POST, 'billing_form': billing_form, 'paypal_form':paypal_form})
 
+
+            # Logged in user
+            user = request.user
+
+            # Create order
+            create_order = Order(user=user, full_name=full_name, email=email, shipping_address=shipping_address, amount_paid=amount_paid, invoice=my_Invoice)
+            create_order.save()
+
+
+            # Add order items
+            # Get the order id
+            order_id = create_order.pk
+            # Get product info
+            for product in cart_products:
+                # Get product id
+                product_id = product.id
+                # Get product price
+                if product.is_sale:
+                    price = product.sale_price
+                else:
+                    price = product.price
+
+                # Get product quantity
+                for key, value in quantities.items():
+                    if int(key) == product_id:
+                        # Create order item
+                        create_order_item = OrderItem(order_id=order_id, product_id=product_id, quantity=value, price=price, user=user)
+                        create_order_item.save()
+
+            # Clear the cart from database
+            current_user = Profile.objects.filter(user__id=request.user.id)
+
+            # Delete shopping cart from database
+            current_user.update(old_cart="")
+
+            return render(request, 'payment/billing_info.html', {'cart_products': cart_products, 'quantities': quantities, 'totals': totals, 'shipping_info': request.POST, 'billing_form': billing_form, 'paypal_form':paypal_form})
         else:
+            # not logged in
+            # Create order
+            create_order = Order(full_name=full_name, email=email, shipping_address=shipping_address, amount_paid=amount_paid, invoice=my_Invoice)
+            create_order.save()
+
+            # Add order items
+            # Get the order id
+            order_id = create_order.pk
+            # Get product info
+            for product in cart_products:
+                # Get product id
+                product_id = product.id
+                # Get product price
+                if product.is_sale:
+                    price = product.sale_price
+                else:
+                    price = product.price
+
+                # Get product quantity
+                for key, value in quantities.items():
+                    if int(key) == product_id:
+                        # Create order item
+                        create_order_item = OrderItem(order_id=order_id, product_id=product_id, quantity=value, price=price)
+                        create_order_item.save()
+            
             # Get payment form
             billing_form = PaymentForm()
             return render(request, 'payment/billing_info.html', {'cart_products': cart_products, 'quantities': quantities, 'totals': totals, 'shipping_info': request.POST, 'billing_form': billing_form})
 
-            
-
-        # Get shipping form
-        shipping_form = ShippingForm(request.POST or None)
-        return render(request, 'payment/billing_info.html', {'cart_products': cart_products, 'quantities': quantities, 'totals': totals, 'shipping_form': shipping_form})
     else:
         messages.success(request, 'Access Denied!')
         return redirect('home')

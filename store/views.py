@@ -192,5 +192,17 @@ def search(request):
         
     else:
         return render(request, 'search.html', {})
+    
+def cargo(request):
+    return render(request, 'cargo.html', {})
+
+def events(request):
+    return render(request, 'events.html', {})
+
+def tours(request):
+    return render(request, 'tours.html', {})
+
+def contact(request):
+    return render(request, 'contact.html', {})
 
 

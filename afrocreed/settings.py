@@ -29,8 +29,19 @@ SECRET_KEY = 'django-insecure-sf3=%0+42^*#mpagl&zu%15wgcij$0k#o+08n93ebpmr&@edu%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-CSRF_TRUSTED_ORIGINS = []
+
+# The below are used for testing purposes on ngrok
+
+# ALLOWED_HOSTS = ['134b-105-160-62-18.ngrok-free.app']
+# CSRF_TRUSTED_ORIGINS = ['https://134b-105-160-62-18.ngrok-free.app']
+
+ALLOWED_HOSTS = ['be59-102-0-7-68.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://be59-102-0-7-68.ngrok-free.app']
+
+
+# Replace the above with your actual domain name in production
+# ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
+# CSRF_TRUSTED_ORIGINS = ['https://yourdomain.com', 'https://www.yourdomain.com']
 
 
 # Application definition

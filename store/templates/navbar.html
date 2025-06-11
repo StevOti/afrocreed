@@ -5,7 +5,7 @@
         <a href="#" class="search-close js-search-close"><span class="icon-close2"></span></a>
         <form action="#" method="post">
           <input type="text" class="form-control" placeholder="Search keyword and hit enter...">
-        </form>  
+        </form>
       </div>
     </div>
 
@@ -23,8 +23,9 @@
                 <a href="{% url 'home' %}">Home</a>
                 <ul class="dropdown">
                   <li><a href="{% url 'about' %}">about</a></li>
-                  <li><a href="#">Menu Two</a></li>
-                  <li><a href="#">Menu Three</a></li>
+                  <li><a href="{% url 'cargo' %}">Cargo</a></li>
+                  <li><a href="{% url 'events' %}">Events</a></li>
+                  <li><a href="{% url 'tours' %}">Tours</a></li>
                   <li class="has-children">
                     <a href="#">
                         <span class="icon-user"> </span>
@@ -69,7 +70,7 @@
               <li><a href="#">Catalog</a></li>
               {% endif %}
               <li><a href="#">New Arrivals</a></li>
-              <li><a href="contact.html">Contact</a></li>
+              <li><a href="{% url 'contact' %}">Contact</a></li>
             </ul>
           </nav>
         </div>
