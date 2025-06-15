@@ -22,7 +22,7 @@
               <li class="has-children active">
                 <a href="{% url 'home' %}">Home</a>
                 <ul class="dropdown">
-                  <li><a href="{% url 'about' %}">about</a></li>
+                  <!-- <li><a href="{% url 'about' %}">about</a></li> -->
                   <li><a href="{% url 'cargo' %}">Cargo</a></li>
                   <li><a href="{% url 'events' %}">Events</a></li>
                   <li><a href="{% url 'tours' %}">Tours</a></li>
@@ -67,7 +67,7 @@
                 </ul>
               </li>
               {% else %}
-              <li><a href="#">Catalog</a></li>
+              <li><a href="{% url 'about' %}">about</a></li>
               {% endif %}
               <li><a href="#">New Arrivals</a></li>
               <li><a href="{% url 'contact' %}">Contact</a></li>
